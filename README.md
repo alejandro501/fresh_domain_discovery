@@ -20,11 +20,13 @@ Usage: ./enumerate_subdomains.sh [-I input_file] [-O output_file] [--tor] [--hel
 
 ## check new subdomains
 ```sh
-Usage: ./check_new_domains.sh [--input <input_file>] [--output <output_file>] [--check-against <old_domains_file>] [--help|-H]
-  --input, -I        Specify the input file (default: domains.txt)
-  --output, -O       Specify the output file (default: new_domains.txt)
-  --check-against, -cA Specify the old domains file to check against (default: old_domains.txt)
+Usage: ./check_new_domains.sh [--input <input_file>] [--output <output_file>] [--check-against <old_domains_file>] [--api-output <api_output_file>] [--help|-H]
+  --input, -I        Specify the input file (default: subdomains)
+  --output, -O       Specify the output file (default: new_subdomains)
+  --check-against, -cA Specify the old domains file to check against (default: old_subdomains)
+  --api-output, -aO  Specify the API output file (default: new_apis)
   --help, -H         Display this help message
+
 ```
 
 ## utils
