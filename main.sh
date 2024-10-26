@@ -1,32 +1,32 @@
 #!/bin/bash
 
-source ./setup_tor.sh
-
 INPUT_FILE="wildcards"
 OUTPUT_FILE="subdomains"
 USE_TOR=false
+OLD_DOMAINS_FILE="old_subdomains"
+NEW_DOMAINS_FILE="new_subdomains"
+API_OUTPUT_FILE="new_apis"
 
 usage() {
-    echo "Usage: $0 [--tor] [-I input_file] [-O output_file] [--help|-H]"
-    echo "  --tor              Run through Tor"
-    echo "  -I, --input        Specify the input file (default: $INPUT_FILE)"
-    echo "  -O, --output       Specify the output file (default: $OUTPUT_FILE)"
-    echo "  --help, -H         Display this help message"
+    echo "Usage: $0 [--tor] [-I input_file] [-O output_file] [-cA old_domains_file] [--help|-H]"
     exit 1
 }
 
+# Parse arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
         --tor) USE_TOR=true ;;
         -I|--input) INPUT_FILE="$2"; shift ;;
         -O|--output) OUTPUT_FILE="$2"; shift ;;
+        -cA|--check-against) OLD_DOMAINS_FILE="$2"; shift ;;
         -H|--help) usage ;;
         *) usage ;;
     esac
     shift
 done
 
-setup_tor "$USE_TOR"
+# 1: Enumerate subdomains
+subfinder -dL "$INPUT_FILE" | httprobe --prefer-https | anew "$OUTPUT_FILE"
 
-./enumerate_subdomains.sh -I "$INPUT_FILE" -O "$OUTPUT_FILE" --tor "$USE_TOR"
-./check_new_subdomains.sh
+# 2: Check for new subdomains
+./check_new_subdomains.sh -I "$OUTPUT_FILE" -O "$NEW_DOMAINS_FILE" -cA "$OLD_DOMAINS_FILE" -aO "$API_OUTPUT_FILE"

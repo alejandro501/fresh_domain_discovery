@@ -49,22 +49,7 @@ enumerate_subdomains() {
 
     echo "Starting subdomain enumeration..."
 
-    mapfile -t domains < "$INPUT_FILE"
-    : > temp_subdomains.txt
-
-    for domain in "${domains[@]}"; do
-        echo "Finding subdomains for: $domain"
-        subfinder -d "$domain" -all | tee -a temp_subdomains.txt | sort -u
-
-        if [[ $? -ne 0 ]]; then
-            echo "Error occurred while finding subdomains for $domain."
-        fi
-    done
-
-    echo "Probing live subdomains..."
-    httprobe -c 50 --prefer-https < temp_subdomains.txt | anew "$OUTPUT_FILE"
-
-    rm temp_subdomains.txt
+    subfinder -dL "$INPUT_FILE" | httprobe --prefer-https | anew "$OUTPUT_FILE"
 
     echo "Subdomain enumeration completed."
     echo "Results saved in '$OUTPUT_FILE'."
