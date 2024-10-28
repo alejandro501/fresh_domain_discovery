@@ -4,11 +4,19 @@ INPUT_FILE="subdomains"
 OUTPUT_FILE="new_subdomains"
 OLD_DOMAINS_FILE="old_subdomains"
 API_OUTPUT_FILE="new_apis"
+NESSUS_OUTPUT_FILE="new_nessus_subdomains"
 
 usage() {
-    echo "Usage: $0 [--input <input_file>] [--output <output_file>] [--check-against <old_domains_file>] [--api-output <api_output_file>] [--help|-H]"
+    echo "Usage: $0 [-I input_file] [-O output_file] [-cA old_domains_file] [-aO api_output_file] [-nO nessus_output_file] [--help|-H]"
+    echo "  -I,  --input          Specify the input file (default: wildcards)"
+    echo "  -O,  --output         Specify the output file (default: subdomains)"
+    echo "  -cA, --check-against  Specify the file to check against old domains"
+    echo "  -aO, --api-output     Specify the API output file"
+    echo "  -nO, --nessus-output  Specify the Nessus output file"
+    echo "  -H,  --help           Display this help message"
     exit 1
 }
+
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -16,6 +24,7 @@ while [[ "$#" -gt 0 ]]; do
         -O|--output) OUTPUT_FILE="$2"; shift ;;
         -cA|--check-against) OLD_DOMAINS_FILE="$2"; shift ;;
         -aO|--api-output) API_OUTPUT_FILE="$2"; shift ;;
+        -nO|--nessus-output) NESSUS_OUTPUT_FILE="$2"; shift ;;
         -H|--help) usage ;;
         *) usage ;;
     esac
@@ -39,8 +48,13 @@ if [ $? -ne 0 ]; then
 fi
 
 # Filter for APIs
-grep "api" "$OUTPUT_FILE" > "$API_OUTPUT_FILE"
-if [ $? -eq 0 ]; then
+if grep -q "api" "$OUTPUT_FILE"; then
+    grep "api" "$OUTPUT_FILE" > "$API_OUTPUT_FILE"
     echo "New domains have been saved to '$OUTPUT_FILE'."
     echo "New API domains have been saved to '$API_OUTPUT_FILE'."
+else
+    echo "No API domains found in '$OUTPUT_FILE'. No output file created."
 fi
+
+# comma-separeted domains with no protocol for nessus
+sed 's|https\?://||g' "$OUTPUT_FILE" | paste -sd, - > "$NESSUS_OUTPUT_FILE"

@@ -8,8 +8,8 @@ usage() {
     echo "Usage: $0 [-I input_file] [-O output_file] [--tor] [--help|-H]"
     echo "  -I, --input        Specify the input file (default: wildcards)"
     echo "  -O, --output       Specify the output file (default: subdomains)"
-    echo "  --tor              Run through Tor"
-    echo "  --help, -H         Display this help message"
+    echo "  -T, --tor          Run through Tor"
+    echo "  -H, --help         Display this help message"
     exit 1
 }
 
@@ -26,7 +26,7 @@ while [[ "$#" -gt 0 ]]; do
     case $1 in
         -I|--input) INPUT_FILE="$2"; shift ;;
         -O|--output) OUTPUT_FILE="$2"; shift ;;
-        --tor) USE_TOR=true ;;
+        -T|--tor) USE_TOR=true ;;
         -H|--help) usage ;;
         *) usage ;;
     esac
